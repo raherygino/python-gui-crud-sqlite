@@ -22,18 +22,6 @@ class ServiceBase:
         raise NotImplementedError
 
     def findBy(self, **condition) -> Entity:
-        """ query a record that meets the condition
-
-        Parameters
-        ----------
-        condition: dict
-            query condition
-
-        Returns
-        -------
-        entity: Entity
-            entity instance, `None` if no record is found
-        """
         raise NotImplementedError
 
     def listBy(self, **condition) -> List[Entity]:
