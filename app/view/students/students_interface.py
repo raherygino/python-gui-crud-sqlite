@@ -13,6 +13,7 @@ from PyQt5.QtCore import Qt, QSize, QCoreApplication, QModelIndex, QPoint
 from PyQt5.QtGui import QCursor
 from ...common.config import *
 from .students_new_dialog import DialogStudent
+from .student_show import DialogStudentShow
 from ...common.database.service.student_service import StudentService
 from PyQt5.QtSql import QSqlDatabase
 from ...common.database.db_initializer import DBInitializer as DB
@@ -112,6 +113,11 @@ class StudentInterface(GalleryInterface):
         btnOk.setText("Create")
         btnOk.clicked.connect(lambda: self.createStudent(self.dialog.studentData()))
         self.dialog.show()
+
+    def showDialogItem(self, id):
+        self.dialog = DialogStudentShow(self.studentService, id, self.parent)
+        self.dialog.yesButton.clicked.connect(lambda: self.dialog.accept())
+        self.dialog.show()
     
     def showDialogView(self, item:QModelIndex):
         id = self.table.item(item.row(), 0).text()
@@ -142,9 +148,6 @@ class StudentInterface(GalleryInterface):
     def searchStudent(self, text:str):
         if '\'' not in text:
             self.refreshTable(query=text)
-            #self.table_student.refresh(self.table,
-            #                          self.studentCtrl.label,
-            #                         self.studentCtrl.search(text))
         
     
     def selectItem(self, item: QModelIndex):
@@ -169,9 +172,10 @@ class StudentInterface(GalleryInterface):
         confirm.show()
     
     def showItem(self, item: QModelIndex):
-        #id = self.table.item(item.row(), 0).text()
+        id = self.table.item(item.row(), 0).text()
         #DialogStudentShow(id, self.myParent).show()
-        print(item.row())
+        self.showDialogItem(id)
+        
 
     def deleteItem(self, item: QModelIndex):
         id = self.table.item(item.row(), 0).text()
