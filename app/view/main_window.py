@@ -58,7 +58,7 @@ class MainWindow(FluentWindow):
         # add navigation items
         t = Translator()
        # self.addSubInterface(self.homeInterface, FIF.HOME, "Home")
-        self.addSubInterface(self.studentInterface, FIF.PEOPLE, "Elèves")
+        self.addSubInterface(self.studentInterface, FIF.PEOPLE, "Students")
         '''
         self.addSubInterface(self.widgetsInterface, FIF.GAME, t.widgets)
         self.addSubInterface(self.tableViewInterface, FIF.LAYOUT, t.table_view)
@@ -100,12 +100,12 @@ class MainWindow(FluentWindow):
     def onSupport(self):
         
         w = MessageBox(
-            'Voir mon profile',
-            'Vous voulez voir mon profil dans le web ?',
+            'Profile',
+            'You want to see my profile?',
             self
         )
-        w.yesButton.setText('Oui')
-        w.cancelButton.setText('Non')
+        w.yesButton.setText('Yes')
+        w.cancelButton.setText('No')
         if w.exec():
             QDesktopServices.openUrl(QUrl(SUPPORT_URL))
         

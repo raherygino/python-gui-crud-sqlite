@@ -23,7 +23,7 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
         self.studentId = 0
         self.service = params.get("service")
         self.student = Student()
-        self.student.gender = "Masculin"
+        self.student.gender = "Male"
         if len(params.keys()) != 0:
             self.studentId = params.get("id")
             self.student = self.service.findById(self.studentId)
@@ -42,23 +42,23 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
         self.title = SubtitleLabel('Ajouter un(e) élève')
 
         self.row = Frame('horizontal', 'row', parent=parent)
-        self.inputLastname = InputText("Nom", self.row)
+        self.inputLastname = InputText("Lastname", self.row)
         self.inputLastname.setText(self.student.lastname)
-        self.inputFirstname = InputText("Prénom", self.row)
+        self.inputFirstname = InputText("Firstname", self.row)
         self.inputFirstname.setText(self.student.firstname)
 
         self.row_1 = Frame('horizontal', 'row_1', parent=parent)
-        self.selectGenre = Select("Genre", ["Masculin", "Féminin"], self.row_1)
-        self.selectGenre.comboBox.setText(self.student.gender)
-        self.inputBirthday = InputDatePicker("Date de naissance", self.row_1)
+        self.selectGenre = Select("Genre", ["Male", "Female"], self.row_1)
+        self.selectGenre.comboBox.setCurrentText(self.student.gender)
+        self.inputBirthday = InputDatePicker("Birthday", self.row_1)
         self.inputBirthday.lineEdit.dateTimeFromText(self.student.birthday)
-        self.inputBirthplace = InputText("Lieu de naissance", self.row_1)
+        self.inputBirthplace = InputText("Birthplace", self.row_1)
         self.inputBirthplace.setText(self.student.birthplace)
 
         self.row_3 = Frame('horizontal', 'row_3', parent=parent)
-        self.inputAddress = InputText("Adresse", self.row_3)
+        self.inputAddress = InputText("Address", self.row_3)
         self.inputAddress.setText(self.student.address)
-        self.inputPhone = InputText("Téléphone", self.row_3)
+        self.inputPhone = InputText("Phone", self.row_3)
         self.inputPhone.setText(self.student.phone)
 
         self.layoutTitle.setMargins(8,4,0,0)

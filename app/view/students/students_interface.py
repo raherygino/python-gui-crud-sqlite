@@ -41,7 +41,7 @@ class StudentInterface(GalleryInterface):
 
     def titleContainte(self, parent):
         row = Frame(VERTICAL, ROW+str(1), parent=parent)
-        label = SubtitleLabel("Liste des élèves", parent)
+        label = SubtitleLabel("List students", parent)
         row.setMargins(9,0,9,0)
         row.addWidget(label)
         self.hBoxLayout.addWidget(row)
@@ -50,12 +50,12 @@ class StudentInterface(GalleryInterface):
         self.container = Frame(VERTICAL, STUDENT+CONTAINER, parent=parent)
         self.row_2 = Frame(HORIZONTAL, ROW+str(2), parent=parent)
         self.searchLineStudent = SearchLineEdit(self)
-        self.searchLineStudent.setPlaceholderText(QCoreApplication.translate(FORM, u"Recherche", None))
+        self.searchLineStudent.setPlaceholderText(QCoreApplication.translate(FORM, u"Search", None))
         self.searchLineStudent.setMaximumSize(QSize(240, 50))
         self.searchLineStudent.textChanged.connect(self.searchStudent)
         
         col = Frame(HORIZONTAL, COL+str(1),parent=parent)
-        self.btnAdd =  PrimaryPushButton('Ajouter', self, FIF.ADD)
+        self.btnAdd =  PrimaryPushButton('Add new student', self, FIF.ADD)
         self.btnAdd.setObjectName(u"ButtonAdd")
         self.btnAdd.clicked.connect(self.showDialog)
 
@@ -103,12 +103,16 @@ class StudentInterface(GalleryInterface):
 
     def showDialog(self):
         self.dialog = DialogStudent(self.parent)
-        self.dialog.yesButton.clicked.connect(lambda: self.createStudent(self.dialog.studentData()))
+        self.dialog.title.setText("Add new student")
+        btnOk = self.dialog.yesButton
+        btnOk.setText("Create")
+        btnOk.clicked.connect(lambda: self.createStudent(self.dialog.studentData()))
         self.dialog.show()
     
     def showDialogView(self, item:QModelIndex):
         id = self.table.item(item.row(), 0).text()
         self.dialog = DialogStudent(self.parent, service=self.studentService,id=id)
+        self.dialog.title.setText(f"Update {self.dialog.student.lastname}")
         btnOk = self.dialog.yesButton
         btnOk.setText("Update")
         btnOk.clicked.connect(lambda: self.updateStudent(id, self.dialog.studentData()))
@@ -144,11 +148,11 @@ class StudentInterface(GalleryInterface):
     
     def selectItem(self, item: QModelIndex):
         menu = RoundMenu(parent=self)
-        menu.addAction(Action(FIF.FOLDER, 'Ouvrir', triggered=lambda:self.showItem(item)))
-        menu.addAction(Action(FIF.EDIT, 'Modifier', triggered=lambda:self.showDialogView(item)))
+        menu.addAction(Action(FIF.FOLDER, 'Show', triggered=lambda:self.showItem(item)))
+        menu.addAction(Action(FIF.EDIT, 'Edit', triggered=lambda:self.showDialogView(item)))
         #menu.addAction(Action(FIF.SCROLL, 'Mouvement', triggered=lambda:self.showDialogMove(item)))
         menu.addSeparator()
-        menu.addAction(Action(FIF.DELETE, 'Supprimer', triggered=lambda:self.confirmDeleteItem(item)))
+        menu.addAction(Action(FIF.DELETE, 'Delete', triggered=lambda:self.confirmDeleteItem(item)))
         menu.menuActions()[-2].setCheckable(True)
         menu.menuActions()[-2].setChecked(True)
 
@@ -159,7 +163,7 @@ class StudentInterface(GalleryInterface):
         menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.DROP_DOWN)
 
     def confirmDeleteItem(self, item: QModelIndex):
-        confirm = MessageBox("Confirmation", "Voulez vous supprimer vraiment", self.parent)
+        confirm = MessageBox("Confirmation", "You want to delete it?", self.parent)
         confirm.accepted.connect(lambda:self.deleteItem(item))
         confirm.show()
     
@@ -171,7 +175,7 @@ class StudentInterface(GalleryInterface):
     def deleteItem(self, item: QModelIndex):
         id = self.table.item(item.row(), 0).text()
         self.studentService.deleteById(id)
-        self.infoMessage(self.parent, "Succès", "Données supprimées!")
+        self.infoMessage(self.parent, "Success", "Student deleted successfully")
         self.refreshTable()
 
     def infoMessage(self, parent, title:str, message:str):
