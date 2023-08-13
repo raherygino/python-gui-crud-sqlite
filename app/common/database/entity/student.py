@@ -13,5 +13,3 @@ class Student(Entity):
     birthplace: str = None
     address: str = None
     phone: str = None
-    createTime: str = None
-    modifiedTime: str = None

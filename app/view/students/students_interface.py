@@ -109,6 +109,9 @@ class StudentInterface(GalleryInterface):
     def showDialogView(self, item:QModelIndex):
         id = self.table.item(item.row(), 0).text()
         self.dialog = DialogStudent(self.parent, service=self.studentService,id=id)
+        btnOk = self.dialog.yesButton
+        btnOk.setText("Update")
+        btnOk.clicked.connect(lambda: self.updateStudent(id, self.dialog.studentData()))
         self.dialog.show()
 
     def createStudent(self, student: Student):
@@ -119,6 +122,15 @@ class StudentInterface(GalleryInterface):
             self.refreshTable()
         else:
             print("error")
+    def updateStudent(self, id:int, student: Student):
+            if(self.studentService.update(id, student)):
+                self.infoMessage(self.parent, "Update", f"{student.firstname} updated succesfully!")
+                self.dialog.accept()
+                self.dialog = None
+                self.refreshTable()
+            else:
+                print("Error")
+        
 
     
     def searchStudent(self, text:str):

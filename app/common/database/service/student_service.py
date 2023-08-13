@@ -29,7 +29,10 @@ class StudentService(ServiceBase):
         return self.studentDao.deleteById(id)
     
     def findById(self, id:int):
-        return self.studentDao.listByIds([id])
+        return self.studentDao.listByIds([id])[0]
+    
+    def update(self, id:int, student:Student):
+        return self.studentDao.update(id, student)
     
 
     

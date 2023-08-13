@@ -41,7 +41,7 @@ class DaoBase:
                 fieldType = "INTEGER"
             query += f"{field.name} {fieldType}, "
 
-        query += "created_at DATETIME)"
+        query += "updated_at, created_at DATETIME)"
         return self.query.exec(query)
         
 
@@ -193,8 +193,6 @@ class DaoBase:
 
     def listByIds(self, ids: list) -> any:
         """ query the records of the primary key value in the list """
-        #print(self.fields[0])
-        #print(self.listByFields(f"id_{self.table}", ids))
         return self.listByFields(f"id_{self.table}", ids)
 
     @finishQuery
@@ -209,119 +207,12 @@ class DaoBase:
         return entities
 
     @finishQuery
-    def update(self, id, field: str, value) -> bool:
-        """ update the value of a field in a record
-
-        Parameters
-        ----------
-        id:
-            primary key value
-
-        filed: str
-            field name
-
-        value:
-            field value
-
-        Returns
-        -------
-        success: bool
-            is the update successful
-        """
-        sql = f"UPDATE {self.table} SET {field} = ? WHERE {self.fields[0]} = ?"
-        self.query.prepare(sql)
-        self.query.addBindValue(value)
-        self.query.addBindValue(id)
-        return self.query.exec()
-
-    @finishQuery
-    def updateByField(self, field: str, old, new) -> bool:
-        """ update the value of a field in a record
-
-        Parameters
-        ----------
-        filed: str
-            field name
-
-        old:
-            old field value
-
-        new:
-            new filed value
-
-        Returns
-        -------
-        success: bool
-            is the update successful
-        """
-        sql = f"UPDATE {self.table} SET {field} = ? WHERE {field} = ?"
-        self.query.prepare(sql)
-        self.query.addBindValue(new)
-        self.query.addBindValue(old)
-        return self.query.exec()
-
-    @finishQuery
-    def updateById(self, entity: Entity) -> bool:
-        """ update a record
-
-        Parameters
-        ----------
-        entity: Entity
-            entity instance
-
-        Returns
-        -------
-        success: bool
-            is the update successful
-        """
-        if len(self.fields) <= 1:
-            return False
-
-        id_ = self.fields[0]
-        values = ','.join([f'{i} = :{i}' for i in self.fields[1:]])
-        sql = f"UPDATE {self.table} SET {values} WHERE {id_} = :{id_}"
-
-        self.query.prepare(sql)
-        self.bindEntityToQuery(entity)
-
-        return self.query.exec()
-
-    @finishQuery
-    def updateByIds(self, entities: List[Entity]) -> bool:
-        """ update multi records
-
-        Parameters
-        ----------
-        entities: List[Entity]
-            entity instances
-
-        Returns
-        -------
-        success: bool
-            is the update successful
-        """
-        if not entities:
-            return True
-
-        if len(self.fields) <= 1:
-            return False
-
-        db = self.getDatabase()
-        db.transaction()
-
-        id_ = self.fields[0]
-        values = ','.join([f'{i} = :{i}' for i in self.fields[1:]])
-        sql = f"UPDATE {self.table} SET {values} WHERE {id_} = :{id_}"
-
-        self.query.prepare(sql)
-
-        for entity in entities:
-            self.bindEntityToQuery(entity)
-            self.query.exec()
-
-        success = db.commit()
-        return success
+    def update(self, id:int, entity:Entity) -> bool:
     
+        fields = ','.join([f'{field} = \'{entity.get(field)}\'' for field in self.fields])
+        sql = f"UPDATE {self.table} SET {fields} WHERE id_{self.table} = '{id}'"
+        return self.query.exec(sql)
+
     @finishQuery
     def create(self, entity: Entity):
         values = ','.join([f'"{entity.get(i)}"' for i in self.fields])
