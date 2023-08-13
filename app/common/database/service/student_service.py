@@ -34,5 +34,7 @@ class StudentService(ServiceBase):
     def update(self, id:int, student:Student):
         return self.studentDao.update(id, student)
     
+    def search(self, value:str):
+        return self.studentDao.search(value)
 
     

@@ -72,7 +72,7 @@ class StudentInterface(GalleryInterface):
         self.row_2.layout.addWidget(col, 0, Qt.AlignRight)
         self.container.addWidget(self.row_2)
 
-        students = self.listStudent()
+        students = self.listStudent(self.studentService.listAll())
         self.tbStudent = Table(parent, students.get("header"), students.get("data"))
         self.table = self.tbStudent.widget()
         self.table.clicked.connect(self.selectItem)
@@ -80,7 +80,7 @@ class StudentInterface(GalleryInterface):
         self.hBoxLayout.addWidget(self.container)
         self.dialog = None
 
-    def listStudent(self):
+    def listStudent(self, data):
         header = ["ID", "Lastname", "Firstname", "Gender", "Birthday", "Birthplace", "Address", "phone"]
         listStudent = [[
                 student.get("id_tbl_student"),
@@ -91,14 +91,18 @@ class StudentInterface(GalleryInterface):
                 student.get("birthplace"),
                 student.get("address"),
                 student.get("phone")]
-                    for student in self.studentService.listAll()]
+                    for student in data]
         return {
             "header": header,
             "data": listStudent
         }
     
-    def refreshTable(self):
-        listStudent = self.listStudent()
+    def refreshTable(self, **kwargs):
+        data = self.studentService.listAll()
+        if (len(kwargs.keys()) != 0):
+            data = self.studentService.search(kwargs.get('query'))
+
+        listStudent = self.listStudent(data)
         self.tbStudent.refresh(self.table, listStudent.get("header"), listStudent.get("data"))
 
     def showDialog(self):
@@ -134,13 +138,10 @@ class StudentInterface(GalleryInterface):
                 self.refreshTable()
             else:
                 print("Error")
-        
-
     
     def searchStudent(self, text:str):
         if '\'' not in text:
-            if text == "gino":
-                print(text)
+            self.refreshTable(query=text)
             #self.table_student.refresh(self.table,
             #                          self.studentCtrl.label,
             #                         self.studentCtrl.search(text))

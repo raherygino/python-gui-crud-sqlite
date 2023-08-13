@@ -18,7 +18,6 @@ def finishQuery(func):
 
     return wrapper
 
-
 class DaoBase:
     """ Database access operation abstract class """
 
@@ -43,69 +42,75 @@ class DaoBase:
 
         query += "updated_at, created_at DATETIME)"
         return self.query.exec(query)
-        
 
     @finishQuery
-    def selectBy(self, **condition) -> Entity:
-        """ query a record that meet the conditions
+    def create(self, entity: Entity):
+        values = ','.join([f'"{entity.get(i)}"' for i in self.fields])
+        fields = ','.join([f'{i}' for i in self.fields])
+        sql = f"INSERT INTO {self.table}({fields}) VALUES ({values})"
+        self.query.prepare(sql)
+        self.bindEntityToQuery(entity)
+        return self.query.exec()
+   
+    @finishQuery
+    def update(self, id:int, entity:Entity) -> bool:
+    
+        fields = ','.join([f'{field} = \'{entity.get(field)}\'' for field in self.fields])
+        sql = f"UPDATE {self.table} SET {fields} WHERE id_{self.table} = '{id}'"
+        return self.query.exec(sql)
+   
+    @finishQuery
+    def deleteById(self, id) -> bool:
+        """ delete a record """
+        sql = f"DELETE FROM {self.table} WHERE id_{self.table} = ?"
+        self.query.prepare(sql)
+        self.query.addBindValue(id)
+        return self.query.exec()
 
-        Parameters
-        ----------
-        condition: dict
-            query condition
+    def listAll(self) -> List[Entity]:
+        """ query all records """
+        sql = f"SELECT * FROM {self.table}"
+        
+        
+        if not self.query.exec(sql):
+            return []
 
-        Returns
-        -------
-        entity: Entity
-            entity instance, `None` if no record is found
-        """
-        self._prepareSelectBy(condition)
+        return self.iterRecords()
+    
+    def search(self, query) -> List[Entity]:
+        """search query records """
 
-        if not (self.query.exec() and self.query.first()):
-            return None
+        condition = ' OR '.join([f'{field} LIKE \'%{query}%\' ' for field in self.fields])
+        sql = f"SELECT * FROM {self.table} WHERE {condition}"
+        
+        if not self.query.exec(sql):
+            return []
+        return self.iterRecords()
 
-        return self.loadFromRecord(self.query.record())
+    def listByFields(self, field: str, values: list):
+        """ query the records of field values in the list """
+        #if field not in self.fields & field not id:
+        #    raise ValueError(f"field name `{field}` is illegal")
 
-    def listBy(self, **condition) -> List[Entity]:
-        """ query all records that meet the conditions
+        if not values:
+            return []
 
-        Parameters
-        ----------
-        condition: dict
-            query condition
+        placeHolders = ','.join(['?']*len(values))
+        sql = f"SELECT * FROM {self.table} WHERE {field} IN ({placeHolders})"
+        self.query.prepare(sql)
 
-        Returns
-        -------
-        entities: List[Entity]
-            entity instances, empty if no records are found
-        """
-        self._prepareSelectBy(condition)
+        for value in values:
+            self.query.addBindValue(value)
 
         if not self.query.exec():
             return []
 
         return self.iterRecords()
 
-    def listLike(self, **condition) -> List[Entity]:
-        """ Fuzzy query all records that meet the conditions (or relationships)
-
-        Parameters
-        ----------
-        condition: dict
-            query condition
-
-        Returns
-        -------
-        entities: List[Entity]
-            entity instances, empty if no records are found
-        """
-        self._prepareSelectLike(condition)
-
-        if not self.query.exec():
-            return []
-
-        return self.iterRecords()
-
+    def listByIds(self, ids: list) -> any:
+        """ query the records of the primary key value in the list """
+        return self.listByFields(f"id_{self.table}", ids)
+    
     def _prepareSelectBy(self, condition: dict):
         """ prepare sql select statement
 
@@ -160,41 +165,6 @@ class DaoBase:
         for v in condition.values():
             self.query.addBindValue(f'%{v}%')
 
-    def listAll(self) -> List[Entity]:
-        """ query all records """
-        sql = f"SELECT * FROM {self.table}"
-        
-        if not self.query.exec(sql):
-            return []
-
-        return self.iterRecords()
-
-    def listByFields(self, field: str, values: list):
-        """ query the records of field values in the list """
-        #if field not in self.fields & field not id:
-        #    raise ValueError(f"field name `{field}` is illegal")
-
-        if not values:
-            return []
-
-        placeHolders = ','.join(['?']*len(values))
-        sql = f"SELECT * FROM {self.table} WHERE {field} IN ({placeHolders})"
-        self.query.prepare(sql)
-
-        for value in values:
-            self.query.addBindValue(value)
-
-        if not self.query.exec():
-            return []
-
-        return self.iterRecords()
-
-
-
-    def listByIds(self, ids: list) -> any:
-        """ query the records of the primary key value in the list """
-        return self.listByFields(f"id_{self.table}", ids)
-
     @finishQuery
     def iterRecords(self) -> List[Entity]:
         """ iterate over all queried records """
@@ -206,196 +176,13 @@ class DaoBase:
 
         return entities
 
-    @finishQuery
-    def update(self, id:int, entity:Entity) -> bool:
-    
-        fields = ','.join([f'{field} = \'{entity.get(field)}\'' for field in self.fields])
-        sql = f"UPDATE {self.table} SET {fields} WHERE id_{self.table} = '{id}'"
-        return self.query.exec(sql)
-
-    @finishQuery
-    def create(self, entity: Entity):
-        values = ','.join([f'"{entity.get(i)}"' for i in self.fields])
-        fields = ','.join([f'{i}' for i in self.fields])
-        sql = f"INSERT INTO {self.table}({fields}) VALUES ({values})"
-        self.query.prepare(sql)
-        self.bindEntityToQuery(entity)
-        return self.query.exec()
-        
-    @finishQuery
-    def insert(self, entity: Entity) -> bool:
-        """ insert a record
-
-        Parameters
-        ----------
-        entity: Entity
-            entity instance
-
-        Returns
-        -------
-        success: bool
-            is the insert successful
-        """
-        values = ','.join([f':{i}' for i in self.fields])
-        sql = f"INSERT INTO {self.table} VALUES ({values})"
-        self.query.prepare(sql)
-        print(sql)
-        self.bindEntityToQuery(entity)
-        return self.query.exec()
-
-    @finishQuery
-    def insertBatch(self, entities: List[Entity], ignore=False) -> bool:
-        """ insert multi records
-
-        Parameters
-        ----------
-        entities: List[Entity]
-            entity instances
-
-        ignore: bool
-            If the primary key exists, the corresponding row will not be inserted when `ignore=True`
-
-        Returns
-        -------
-        success: bool
-            is the insert successful
-        """
-        if not entities:
-            return True
-
-        db = self.getDatabase()
-        db.transaction()
-
-        values = ','.join([f':{i}' for i in self.fields])
-        if not ignore:
-            sql = f"INSERT INTO {self.table} VALUES ({values})"
-        else:
-            sql = f"INSERT OR IGNORE INTO {self.table} VALUES ({values})"
-
-        self.query.prepare(sql)
-
-        for entity in entities:
-            self.bindEntityToQuery(entity)
-            self.query.exec()
-
-        return db.commit()
-
-    @finishQuery
-    def insertOrUpdate(self, entity: Entity):
-        """ insert a new record or update the record if it already exists
-
-        Parameters
-        ----------
-        entity: Entity
-            entity instance
-
-        Returns
-        -------
-        success: bool
-            is the insert successful
-        """
-        # insert a new record or ignore it if the primary key already exists
-        values = ','.join([f':{i}' for i in self.fields])
-        sql = f"INSERT OR IGNORE INTO {self.table} VALUES ({values})"
-        self.query.prepare(sql)
-        self.bindEntityToQuery(entity)
-        success = self.query.exec()
-
-        # update record
-        success &= self.updateById(entity)
-        return success
-
-    @finishQuery
-    def deleteById(self, id) -> bool:
-        """ delete a record
-
-        Parameters
-        ----------
-        id:
-            primary key value
-
-        Returns
-        -------
-        success: bool
-            is the delete successful
-        """
-        sql = f"DELETE FROM {self.table} WHERE id_{self.table} = ?"
-        self.query.prepare(sql)
-        self.query.addBindValue(id)
-        return self.query.exec()
-
-    @finishQuery
-    def deleteByFields(self, field: str, values: list):
-        """ delete multi records based on the value of a field """
-        if field not in self.fields:
-            raise ValueError(f"field name `{field}` is illegal")
-
-        if not values:
-            return True
-
-        placeHolders = ','.join(['?']*len(values))
-        sql = f"DELETE FROM {self.table} WHERE {field} IN ({placeHolders})"
-        self.query.prepare(sql)
-
-        for value in values:
-            self.query.addBindValue(value)
-
-        return self.query.exec()
-
-    @finishQuery
-    def deleteByMultiFields(self, **condition):
-        """ delete multi records based on the value of multi fields """
-        if not condition:
-            return
-
-        placeHolders = []
-        keys = list(condition.keys())
-        for _ in range(len(condition[keys[0]])):
-            placeHolder = ' AND '.join([f"{k} = ?" for k in keys])
-            placeHolders.append(f"({placeHolder})")
-
-        sql = f"DELETE FROM {self.table} WHERE {' OR '.join(placeHolders)}"
-        self.query.prepare(sql)
-
-        for value in zip(*condition.values()):
-            for v in value:
-                self.query.addBindValue(v)
-
-        return self.query.exec()
-
-    def deleteByIds(self, ids: list) -> bool:
-        """ delete multi records
-
-        Parameters
-        ----------
-        ids: list
-            primary key values
-
-        Returns
-        -------
-        success: bool
-            is the delete successful
-        """
-        return self.deleteByFields(self.fields[0], ids)
-
     def clearTable(self):
         """ clear all data from table """
         return self.query.exec(f"DELETE FROM {self.table}")
 
     @classmethod
     def loadFromRecord(cls, record: QSqlRecord) -> Entity:
-        """ create an entity instance from a record
-
-        Parameters
-        ----------
-        record: QSqlRecord
-            record
-
-        Returns
-        -------
-        entity: Entity
-            entity instance
-        """
+        """ create an entity instance from a record """
         entity = EntityFactory.create(cls.table)
 
         for i in range(record.count()):
