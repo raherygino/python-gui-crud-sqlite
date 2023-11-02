@@ -25,10 +25,8 @@ class MainWindow(FluentWindow):
     
     def __init__(self):
         super().__init__()
+        self.trans = Translate(Lang().current).text
         self.initWindow()
-        #self.trans = Translate(Lang().current).text
-        
-        t = Translator()
 
         # create sub interface
         #self.homeInterface = HomeInterface(self)
@@ -81,7 +79,7 @@ class MainWindow(FluentWindow):
         self.resize(960, 670)
         self.setMinimumWidth(760)
         self.setWindowIcon(QIcon('app/resource/images/logo.png'))
-        self.setWindowTitle('ENIAP Soft')
+        self.setWindowTitle(self.trans['app_name'])
         
         # create splash screen
         self.splashScreen = SplashScreen(self.windowIcon(), self)
