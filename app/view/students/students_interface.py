@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import QFrame, QVBoxLayout, QTableWidgetItem, QAction
 from PyQt5.QtCore import Qt, QSize, QCoreApplication, QModelIndex, QPoint
 from ...common.config import *
 from .students_new_dialog import DialogStudent
+from ...common.database.db_initializer import DBInitializer
 
 class StudentInterface(GalleryInterface):
     """ Student interface """
@@ -24,6 +25,8 @@ class StudentInterface(GalleryInterface):
             subtitle='',
             parent=parent
         )
+
+        DBInitializer.init()
 
         self.parent = parent
         
