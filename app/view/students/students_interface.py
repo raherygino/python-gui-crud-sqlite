@@ -11,6 +11,7 @@ from qfluentwidgets import FluentIcon as FIF
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QTableWidgetItem, QAction
 from PyQt5.QtCore import Qt, QSize, QCoreApplication, QModelIndex, QPoint
 from ...common.config import *
+from .students_new_dialog import DialogStudent
 
 class StudentInterface(GalleryInterface):
     """ Student interface """
@@ -23,6 +24,8 @@ class StudentInterface(GalleryInterface):
             subtitle='',
             parent=parent
         )
+
+        self.parent = parent
         
         self.hBoxLayout = QVBoxLayout(self)
         self.titleContainte(parent)
@@ -42,12 +45,12 @@ class StudentInterface(GalleryInterface):
         self.searchLineStudent = SearchLineEdit(self)
         self.searchLineStudent.setPlaceholderText(QCoreApplication.translate(FORM, u"Recherche", None))
         self.searchLineStudent.setMaximumSize(QSize(240, 50))
-        #self.searchLineStudent.textChanged.connect(self.searchStudent)
+        self.searchLineStudent.textChanged.connect(self.searchStudent)
         
         col = Frame(HORIZONTAL, COL+str(1),parent=parent)
         self.btnAdd =  PushButton('Ajouter', self, FIF.ADD)
         self.btnAdd.setObjectName(u"PrimaryToolButton")
-        #self.btnAdd.clicked.connect(self.showDialog)
+        self.btnAdd.clicked.connect(self.showDialog)
 
         self.btnFlux =  PrimaryPushButton('Seed', self, FIF.DEVELOPER_TOOLS)
         self.btnFlux.setObjectName(u"PrimaryToolButton")
@@ -66,6 +69,10 @@ class StudentInterface(GalleryInterface):
         self.container.addWidget(self.tbStudent.widget())
         self.hBoxLayout.addWidget(self.container)
         self.dialog = None
+
+    def showDialog(self):
+        self.dialog = DialogStudent(self.parent)
+        self.dialog.show()
 
     
     def searchStudent(self, text:str):
