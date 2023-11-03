@@ -41,13 +41,8 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
 
         self.row_1 = Frame('horizontal', 'row_1', parent=parent)
         self.selectGenre = Select("Genre", ["Masculin", "Féminin"], self.row_1)
-        self.inputHeight = InputSpinBox("Hauteur (m)", True, self.row_1)
-        self.inputWeight = InputSpinBox("Poids (kg)",False, self.row_1)
-
-        self.row_2 = Frame('horizontal', 'row_2', parent=parent)
-        
-        self.inputBirthday = InputDatePicker("Date de naissance", self.row_2)
-        self.inputBirthplace = InputText("Lieu de naissance", self.row_2)
+        self.inputBirthday = InputDatePicker("Date de naissance", self.row_1)
+        self.inputBirthplace = InputText("Lieu de naissance", self.row_1)
 
         self.row_3 = Frame('horizontal', 'row_3', parent=parent)
         self.inputAddress = InputText("Adresse", self.row_3)
@@ -62,7 +57,6 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
         self.layoutTitle.setMargins(8,4,0,0)
         self.row.setMargins(0,0,0,0)
         self.row_1.setMargins(0,0,0,0)
-        self.row_2.setMargins(0,0,0,0)
         self.row_3.setMargins(0,0,0,0)
         self.row_4.setMargins(0,0,0,0)
 
@@ -70,7 +64,6 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
         self.content.addWidget(self.layoutTitle)
         self.content.addWidget(self.row)
         self.content.addWidget(self.row_1)
-        self.content.addWidget(self.row_2)
         self.content.addWidget(self.row_3)
         self.content.addWidget(self.row_4)
 

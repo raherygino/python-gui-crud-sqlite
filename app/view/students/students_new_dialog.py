@@ -41,38 +41,24 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
 
         self.row_1 = Frame('horizontal', 'row_1', parent=parent)
         self.selectGenre = Select("Genre", ["Masculin", "Féminin"], self.row_1)
-        self.inputHeight = InputSpinBox("Hauteur (m)", True, self.row_1)
-        self.inputWeight = InputSpinBox("Poids (kg)",False, self.row_1)
+        self.inputBirthday = InputDatePicker("Date de naissance", self.row_1)
+        self.inputBirthplace = InputText("Lieu de naissance", self.row_1)
 
-        self.row_2 = Frame('horizontal', 'row_2', parent=parent)
-        
-        self.inputBirthday = InputDatePicker("Date de naissance", self.row_2)
-        self.inputBirthplace = InputText("Lieu de naissance", self.row_2)
 
         self.row_3 = Frame('horizontal', 'row_3', parent=parent)
         self.inputAddress = InputText("Adresse", self.row_3)
         self.inputPhone = InputText("Téléphone", self.row_3)
 
-        self.row_4 = Frame('horizontal', 'row_4', parent=parent)
-        self.selectLevel = Select("Niveau", ["Elève Agent de Police", "Elève Inspecteur de Police"], self.row_4)
-        self.selectCompany = Select("Compagnie", ["1ère", "2ème", "3ème"], self.row_4)
-        self.selectSection = Select("Section", ["1ère", "2ème", "3ème", "4ème", "5ème", "6ème","7ème", "8ème",], self.row_4)
-        self.inputNumber = InputSpinBox("Numéro",False, self.row_4)
-
         self.layoutTitle.setMargins(8,4,0,0)
         self.row.setMargins(0,0,0,0)
         self.row_1.setMargins(0,0,0,0)
-        self.row_2.setMargins(0,0,0,0)
         self.row_3.setMargins(0,0,0,0)
-        self.row_4.setMargins(0,0,0,0)
 
         self.layoutTitle.addWidget(self.title)
         self.content.addWidget(self.layoutTitle)
         self.content.addWidget(self.row)
         self.content.addWidget(self.row_1)
-        self.content.addWidget(self.row_2)
         self.content.addWidget(self.row_3)
-        self.content.addWidget(self.row_4)
 
     def yesBtnEvent(self):
         self.accept()
