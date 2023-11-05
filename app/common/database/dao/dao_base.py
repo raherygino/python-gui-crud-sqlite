@@ -5,6 +5,7 @@ from PyQt5.QtSql import QSqlDatabase, QSqlRecord
 
 from ..entity import Entity, EntityFactory
 from .sql_query import SqlQuery
+import dataclasses
 
 
 def finishQuery(func):
@@ -27,9 +28,22 @@ class DaoBase:
     def __init__(self, db: QSqlDatabase = None):
         self.setDatabase(db)
 
-    def createTable(self):
+    def createTable(self, obj):
         """ create table """
-        raise NotImplementedError
+        query = f"CREATE TABLE IF NOT EXISTS {self.table}("
+        query += f"id_{self.table} INTEGER PRIMARY KEY, "
+        
+        for field in dataclasses.fields(obj):
+            fieldType = str(field.type)
+            if (fieldType.find('str') != -1):
+                fieldType = "TEXT"
+            else:
+                fieldType = "INTEGER"
+            query += f"{field.name} {fieldType}, "
+
+        query += "created_at DATETIME)"
+        return self.query.exec(query)
+        
 
     @finishQuery
     def selectBy(self, **condition) -> Entity:
