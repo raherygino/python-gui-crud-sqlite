@@ -1,5 +1,6 @@
 from .entity import Entity
 from .song_info import SongInfo
+from .student import Student
 
 
 class EntityFactory:
