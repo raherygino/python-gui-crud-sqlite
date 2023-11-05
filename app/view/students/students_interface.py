@@ -81,11 +81,11 @@ class StudentInterface(GalleryInterface):
         self.dialog = None
 
     def listStudent(self):
-        header = ["ID", "Firstname", "Lastname", "Gender", "Birthday", "Birthplace", "Address", "phone"]
+        header = ["ID", "Lastname", "Firstname", "Gender", "Birthday", "Birthplace", "Address", "phone"]
         listStudent = [[
                 student.get("id_tbl_student"),
-                student.get("firstname"),
                 student.get("lastname"),
+                student.get("firstname"),
                 student.get("gender"),
                 student.get("birthday"),
                 student.get("birthplace"),
@@ -104,6 +104,11 @@ class StudentInterface(GalleryInterface):
     def showDialog(self):
         self.dialog = DialogStudent(self.parent)
         self.dialog.yesButton.clicked.connect(lambda: self.createStudent(self.dialog.studentData()))
+        self.dialog.show()
+    
+    def showDialogView(self, item:QModelIndex):
+        id = self.table.item(item.row(), 0).text()
+        self.dialog = DialogStudent(self.parent, service=self.studentService,id=id)
         self.dialog.show()
 
     def createStudent(self, student: Student):
@@ -128,7 +133,7 @@ class StudentInterface(GalleryInterface):
     def selectItem(self, item: QModelIndex):
         menu = RoundMenu(parent=self)
         menu.addAction(Action(FIF.FOLDER, 'Ouvrir', triggered=lambda:self.showItem(item)))
-        menu.addAction(Action(FIF.EDIT, 'Modifier'))
+        menu.addAction(Action(FIF.EDIT, 'Modifier', triggered=lambda:self.showDialogView(item)))
         #menu.addAction(Action(FIF.SCROLL, 'Mouvement', triggered=lambda:self.showDialogMove(item)))
         menu.addSeparator()
         menu.addAction(Action(FIF.DELETE, 'Supprimer', triggered=lambda:self.confirmDeleteItem(item)))

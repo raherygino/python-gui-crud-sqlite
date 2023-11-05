@@ -160,12 +160,6 @@ class DaoBase:
         for v in condition.values():
             self.query.addBindValue(f'%{v}%')
 
-
-    def all(self):
-        sql = f"SELECT * FROM {self.table}"
-        
-
-
     def listAll(self) -> List[Entity]:
         """ query all records """
         sql = f"SELECT * FROM {self.table}"
@@ -177,7 +171,7 @@ class DaoBase:
 
     def listByFields(self, field: str, values: list):
         """ query the records of field values in the list """
-        if field not in self.fields:
+        if field not in self.fields & field != f'id_{self.table}':
             raise ValueError(f"field name `{field}` is illegal")
 
         if not values:
@@ -199,7 +193,8 @@ class DaoBase:
 
     def listByIds(self, ids: list) -> List[Entity]:
         """ query the records of the primary key value in the list """
-        return self.listByFields(self.fields[0], ids)
+        #print(self.fields[0])
+        return self.listByFields(f"id_{self.table}", ids)
 
     @finishQuery
     def iterRecords(self) -> List[Entity]:

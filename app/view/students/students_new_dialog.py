@@ -11,7 +11,6 @@ from ...components.input.InputText import InputText
 from ...components.input.SpinBox import InputSpinBox
 from ...components.input.DatePicker import InputDatePicker
 from ...components.input.Select import Select
-
 from ...common.database.entity.student import Student
 
 class DialogStudent(MaskDialogBase, Ui_MessageBox):
@@ -19,9 +18,13 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
     yesSignal = pyqtSignal()
     cancelSignal = pyqtSignal()
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, **params):
         super().__init__(parent=parent)
-
+        #print(len(params.keys()))
+        self.service = params.get("service")
+        print(self.service.findById(params.get("id")))
+        print(params.get("id"))
+        #print(self.service.findById(params.get("id")))
         self.initWidgets(parent=parent)
         self._setUpUi(self.content, self.widget)
         self.setShadowEffect(60, (0, 10), QColor(0, 0, 0, 50))

@@ -28,5 +28,8 @@ class StudentService(ServiceBase):
     def deleteById(self, id:int):
         return self.studentDao.deleteById(id)
     
+    def findById(self, id:int):
+        return self.studentDao.listByIds([id])
+    
 
     
