@@ -23,7 +23,7 @@ class SqlQuery(QSqlQuery):
         error = self.lastError()
         if error.isValid() and error.type() != QSqlError.NoError:
             msg = f'"{error.text()}" for query "{self.lastBoundQuery()}"'
-            self.logger.error(msg)
+            #self.logger.error(msg)
 
         return False
 

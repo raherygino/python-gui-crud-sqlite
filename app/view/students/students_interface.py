@@ -32,9 +32,12 @@ class StudentInterface(GalleryInterface):
         #Example 
         DBInitializer.init()
         service = SongInfoService(QSqlDatabase.database(DBInitializer.CONNECTION_NAME))
-        song = SongInfo("hrllo","title","","",2023,"",0,0,0,0,0,123,32434)
+        song = SongInfo("zan ary eeh","new","","",2023,"",0,0,0,0,0,123,32434)
         if(service.add(song)):
             print("added")
+        
+        for sng in service.listAll():
+            print(f"{sng.file} {sng.title}")
         #End example
         
         self.parent = parent
