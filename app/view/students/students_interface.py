@@ -13,6 +13,9 @@ from PyQt5.QtCore import Qt, QSize, QCoreApplication, QModelIndex, QPoint
 from ...common.config import *
 from .students_new_dialog import DialogStudent
 from ...common.database.db_initializer import DBInitializer
+from ...common.database.service.song_info_service import SongInfoService
+from ...common.database.entity.song_info import SongInfo
+from PyQt5.QtSql import QSqlDatabase
 
 class StudentInterface(GalleryInterface):
     """ Student interface """
@@ -26,8 +29,14 @@ class StudentInterface(GalleryInterface):
             parent=parent
         )
 
+        #Example 
         DBInitializer.init()
-
+        service = SongInfoService(QSqlDatabase.database(DBInitializer.CONNECTION_NAME))
+        song = SongInfo("hrllo","title","","",2023,"",0,0,0,0,0,123,32434)
+        if(service.add(song)):
+            print("added")
+        #End example
+        
         self.parent = parent
         
         self.hBoxLayout = QVBoxLayout(self)
