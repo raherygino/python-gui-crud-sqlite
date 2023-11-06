@@ -3,6 +3,7 @@ from PyQt5.QtSql import QSqlDatabase
 from PyQt5.QtWidgets import qApp
 
 from .service.song_info_service import SongInfoService
+from .service.student_service import StudentService
 
 
 class DBInitializer:
@@ -21,4 +22,5 @@ class DBInitializer:
             cls.logger.error("Database connection failed")
             qApp.exit()
 
-        SongInfoService(db).createTable()
+        #SongInfoService(db).createTable()
+        StudentService(db).createTable()

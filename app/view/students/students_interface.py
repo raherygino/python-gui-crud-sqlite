@@ -12,36 +12,39 @@ from PyQt5.QtWidgets import QFrame, QVBoxLayout, QTableWidgetItem, QAction
 from PyQt5.QtCore import Qt, QSize, QCoreApplication, QModelIndex, QPoint
 from ...common.config import *
 from .students_new_dialog import DialogStudent
-from ...common.database.db_initializer import DBInitializer
-from ...common.database.service.song_info_service import SongInfoService
-from ...common.database.entity.song_info import SongInfo
+from ...common.database.service.student_service import StudentService
 from PyQt5.QtSql import QSqlDatabase
+from ...common.database.db_initializer import DBInitializer as DB
+from ...common.database.dao.student_dao import Student
 
 class StudentInterface(GalleryInterface):
     """ Student interface """
 
     def __init__(self, parent=None):
-        t = Translator()
+        self.db = parent.db
         self.trans = Translate(Lang().current).text
+
         super().__init__(
             title='',
             subtitle='',
             parent=parent
         )
+        
+        
+        db = QSqlDatabase.database(self.db.CONNECTION_NAME, True)
+        studentService = StudentService(db)
+        insert = studentService.create(Student(
+            "Georginot", "Armelin", "Male", "20/04/1997",
+            "Ranotsara Nord", "Bevokatra Antsirabe", "034 65 007 00", None, None
+        ))
 
-        #Example 
-        DBInitializer.init()
-        service = SongInfoService(QSqlDatabase.database(DBInitializer.CONNECTION_NAME))
-        song = SongInfo("zan ary eeh","new","","",2023,"",0,0,0,0,0,123,32434)
-        if(service.add(song)):
-            print("added")
-        
-        for sng in service.listAll():
-            print(f"{sng.file} {sng.title}")
-        #End example
-        
+        if (insert):
+            print("ok")
+            #studentService.deleteById(1)
+        else:
+            print("error") 
+
         self.parent = parent
-        
         self.hBoxLayout = QVBoxLayout(self)
         self.titleContainte(parent)
         self.container(parent)

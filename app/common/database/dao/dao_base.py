@@ -316,7 +316,16 @@ class DaoBase:
 
         success = db.commit()
         return success
-
+    
+    @finishQuery
+    def create(self, entity: Entity):
+        values = ','.join([f'"{entity.get(i)}"' for i in self.fields])
+        fields = ','.join([f'{i}' for i in self.fields])
+        sql = f"INSERT INTO {self.table}({fields}) VALUES ({values})"
+        self.query.prepare(sql)
+        self.bindEntityToQuery(entity)
+        return self.query.exec()
+        
     @finishQuery
     def insert(self, entity: Entity) -> bool:
         """ insert a record
@@ -334,6 +343,7 @@ class DaoBase:
         values = ','.join([f':{i}' for i in self.fields])
         sql = f"INSERT INTO {self.table} VALUES ({values})"
         self.query.prepare(sql)
+        print(sql)
         self.bindEntityToQuery(entity)
         return self.query.exec()
 
@@ -413,7 +423,7 @@ class DaoBase:
         success: bool
             is the delete successful
         """
-        sql = f"DELETE FROM {self.table} WHERE {self.fields[0]} = ?"
+        sql = f"DELETE FROM {self.table} WHERE id_{self.table} = ?"
         self.query.prepare(sql)
         self.query.addBindValue(id)
         return self.query.exec()

@@ -20,6 +20,7 @@ from ..common.Translate import Translate
 from ..common import resource
 from qfluentwidgets import isDarkTheme
 from pynput.mouse import Listener
+from app.common.database.db_initializer import DBInitializer as DB
 
 class MainWindow(FluentWindow):
     
@@ -27,6 +28,9 @@ class MainWindow(FluentWindow):
         super().__init__()
         self.trans = Translate(Lang().current).text
         self.initWindow()
+        #Initilize DATABASE 
+        self.db = DB
+        self.db.init()
 
         # create sub interface
         #self.homeInterface = HomeInterface(self)
