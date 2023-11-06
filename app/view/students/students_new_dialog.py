@@ -23,7 +23,7 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
         #print(len(params.keys()))
         self.service = params.get("service")
         print(self.service.findById(params.get("id")))
-        print(params.get("id"))
+        #print(params.get("id"))
         #print(self.service.findById(params.get("id")))
         self.initWidgets(parent=parent)
         self._setUpUi(self.content, self.widget)

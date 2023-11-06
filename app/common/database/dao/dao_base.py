@@ -171,8 +171,8 @@ class DaoBase:
 
     def listByFields(self, field: str, values: list):
         """ query the records of field values in the list """
-        if field not in self.fields & field != f'id_{self.table}':
-            raise ValueError(f"field name `{field}` is illegal")
+        #if field not in self.fields & field not id:
+        #    raise ValueError(f"field name `{field}` is illegal")
 
         if not values:
             return []
@@ -191,9 +191,10 @@ class DaoBase:
 
 
 
-    def listByIds(self, ids: list) -> List[Entity]:
+    def listByIds(self, ids: list) -> any:
         """ query the records of the primary key value in the list """
         #print(self.fields[0])
+        #print(self.listByFields(f"id_{self.table}", ids))
         return self.listByFields(f"id_{self.table}", ids)
 
     @finishQuery
