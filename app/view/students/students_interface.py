@@ -30,20 +30,8 @@ class StudentInterface(GalleryInterface):
             parent=parent
         )
         
-        
-        db = QSqlDatabase.database(self.db.CONNECTION_NAME, True)
-        studentService = StudentService(db)
-        insert = studentService.create(Student(
-            "Georginot", "Armelin", "Male", "20/04/1997",
-            "Ranotsara Nord", "Bevokatra Antsirabe", "034 65 007 00", None, None
-        ))
-
-        if (insert):
-            print("ok")
-            #studentService.deleteById(1)
-        else:
-            print("error") 
-
+        self.db = QSqlDatabase.database(self.db.CONNECTION_NAME, True)
+        self.studentService = StudentService(self.db)
         self.parent = parent
         self.hBoxLayout = QVBoxLayout(self)
         self.titleContainte(parent)
@@ -83,14 +71,46 @@ class StudentInterface(GalleryInterface):
         self.row_2.layout.addWidget(col, 0, Qt.AlignRight)
         
         self.container.addWidget(self.row_2)
-        self.tbStudent = Table(parent, ["Name", "Age"], [["Georgino", "26"],["Armelin", "18"]])
+        #listsT = self.studentService.listAll()
+        students = self.listStudent()
+        self.tbStudent = Table(parent, students.get("header"), students.get("data"))
+        self.table = self.tbStudent.widget()
         self.container.addWidget(self.tbStudent.widget())
         self.hBoxLayout.addWidget(self.container)
         self.dialog = None
 
+    def listStudent(self):
+        header = ["Firstname", "Lastname", "Gender", "Birthday", "Birthplace", "Address", "phone"]
+        listStudent = [[
+                student.get("firstname"),
+                student.get("lastname"),
+                student.get("gender"),
+                student.get("birthday"),
+                student.get("birthplace"),
+                student.get("address"),
+                student.get("phone")]
+                    for student in self.studentService.listAll()]
+        return {
+            "header": header,
+            "data": listStudent
+        }
+    
+    def refreshTable(self):
+        listStudent = self.listStudent()
+        self.tbStudent.refresh(self.table, listStudent.get("header"), listStudent.get("data"))
+
     def showDialog(self):
         self.dialog = DialogStudent(self.parent)
+        self.dialog.yesButton.clicked.connect(lambda: self.createStudent(self.dialog.studentData()))
         self.dialog.show()
+
+    def createStudent(self, student: Student):
+        if (self.studentService.create(student)):
+            self.dialog.accept()
+            self.dialog = None
+            self.refreshTable()
+        else:
+            print("error")
 
     
     def searchStudent(self, text:str):

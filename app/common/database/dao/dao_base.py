@@ -160,9 +160,16 @@ class DaoBase:
         for v in condition.values():
             self.query.addBindValue(f'%{v}%')
 
+
+    def all(self):
+        sql = f"SELECT * FROM {self.table}"
+        
+
+
     def listAll(self) -> List[Entity]:
         """ query all records """
         sql = f"SELECT * FROM {self.table}"
+        
         if not self.query.exec(sql):
             return []
 
@@ -187,6 +194,8 @@ class DaoBase:
             return []
 
         return self.iterRecords()
+
+
 
     def listByIds(self, ids: list) -> List[Entity]:
         """ query the records of the primary key value in the list """

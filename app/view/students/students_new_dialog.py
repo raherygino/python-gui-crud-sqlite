@@ -3,6 +3,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QLabel, QFrame, QVBoxLayout, QHBoxLayout, QPushButton
 from qframelesswindow import FramelessDialog
 from qfluentwidgets import TextWrap, FluentStyleSheet, PrimaryPushButton, SubtitleLabel
+
 from ...components.dialog.mask import MaskDialogBase
 from ...components.dialog.dialog import Ui_MessageBox
 from ...components.layout.Frame import Frame
@@ -11,7 +12,7 @@ from ...components.input.SpinBox import InputSpinBox
 from ...components.input.DatePicker import InputDatePicker
 from ...components.input.Select import Select
 
-from ...backend.models.Student import Student
+from ...common.database.entity.student import Student
 
 class DialogStudent(MaskDialogBase, Ui_MessageBox):
 
@@ -65,24 +66,18 @@ class DialogStudent(MaskDialogBase, Ui_MessageBox):
 
     def getYesBtn(self):
         return self.yesButton
-    '''
-    def studentData(self):
+
+    def studentData(self) -> Student:
         return Student(
             self.inputLastname.text(),
             self.inputFirstname.text(),
             self.selectGenre.text(),
-            self.inputHeight.text(),
-            self.inputWeight.text(),
             self.inputBirthday.text(),
             self.inputBirthplace.text(),
-            self.inputPhone.text(),
             self.inputAddress.text(),
-            self.selectLevel.text(),
-            self.selectCompany.text(),
-            self.selectSection.text(),
-            self.inputNumber.text()
-        ) '''
-        
+            self.inputPhone.text(),
+            None, None
+        )
     def eventFilter(self, obj, e: QEvent):
         if obj is self.window():
             if e.type() == QEvent.Resize:

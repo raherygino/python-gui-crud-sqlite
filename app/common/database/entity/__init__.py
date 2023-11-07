@@ -23,6 +23,7 @@ class EntityFactory:
         tables = {
             "tbl_song_info": SongInfo,
             "tbl_playlist_song_info": SongInfo,
+            "tbl_student": Student
         }
         if table not in tables:
             raise ValueError(f"Table name `{table}` is illegal")
