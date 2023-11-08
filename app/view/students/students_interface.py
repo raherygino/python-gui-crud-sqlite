@@ -10,6 +10,7 @@ from qfluentwidgets import (SubtitleLabel, SearchLineEdit, PushButton,MenuAnimat
 from qfluentwidgets import FluentIcon as FIF
 from PyQt5.QtWidgets import QFrame, QVBoxLayout, QTableWidgetItem, QAction
 from PyQt5.QtCore import Qt, QSize, QCoreApplication, QModelIndex, QPoint
+from PyQt5.QtGui import QCursor
 from ...common.config import *
 from .students_new_dialog import DialogStudent
 from ...common.database.service.student_service import StudentService
@@ -54,34 +55,35 @@ class StudentInterface(GalleryInterface):
         self.searchLineStudent.textChanged.connect(self.searchStudent)
         
         col = Frame(HORIZONTAL, COL+str(1),parent=parent)
-        self.btnAdd =  PushButton('Ajouter', self, FIF.ADD)
-        self.btnAdd.setObjectName(u"PrimaryToolButton")
+        self.btnAdd =  PrimaryPushButton('Ajouter', self, FIF.ADD)
+        self.btnAdd.setObjectName(u"ButtonAdd")
         self.btnAdd.clicked.connect(self.showDialog)
 
-        self.btnFlux =  PrimaryPushButton('Seed', self, FIF.DEVELOPER_TOOLS)
-        self.btnFlux.setObjectName(u"PrimaryToolButton")
+        #self.btnFlux =  PrimaryPushButton('Seed', self, FIF.DEVELOPER_TOOLS)
+        #self.btnFlux.setObjectName(u"PrimaryToolButton")
         #self.btnFlux.clicked.connect(self.seed)
 
         col.layout.addWidget(self.btnAdd)
-        col.layout.addWidget(self.btnFlux)
+        #col.layout.addWidget(self.btnFlux)
         col.setMargins(0,0,0,0)
         
         self.row_2.setMargins(0,0,0,0)
         self.row_2.addWidget(self.searchLineStudent)
         self.row_2.layout.addWidget(col, 0, Qt.AlignRight)
-        
         self.container.addWidget(self.row_2)
-        #listsT = self.studentService.listAll()
+
         students = self.listStudent()
         self.tbStudent = Table(parent, students.get("header"), students.get("data"))
         self.table = self.tbStudent.widget()
+        self.table.clicked.connect(self.selectItem)
         self.container.addWidget(self.tbStudent.widget())
         self.hBoxLayout.addWidget(self.container)
         self.dialog = None
 
     def listStudent(self):
-        header = ["Firstname", "Lastname", "Gender", "Birthday", "Birthplace", "Address", "phone"]
+        header = ["ID", "Firstname", "Lastname", "Gender", "Birthday", "Birthplace", "Address", "phone"]
         listStudent = [[
+                student.get("id_tbl_student"),
                 student.get("firstname"),
                 student.get("lastname"),
                 student.get("gender"),
@@ -106,6 +108,7 @@ class StudentInterface(GalleryInterface):
 
     def createStudent(self, student: Student):
         if (self.studentService.create(student)):
+            self.infoMessage(self.parent, "Created", "Student created succesfully!")
             self.dialog.accept()
             self.dialog = None
             self.refreshTable()
@@ -121,3 +124,46 @@ class StudentInterface(GalleryInterface):
             #                          self.studentCtrl.label,
             #                         self.studentCtrl.search(text))
         
+    
+    def selectItem(self, item: QModelIndex):
+        menu = RoundMenu(parent=self)
+        menu.addAction(Action(FIF.FOLDER, 'Ouvrir', triggered=lambda:self.showItem(item)))
+        menu.addAction(Action(FIF.EDIT, 'Modifier'))
+        #menu.addAction(Action(FIF.SCROLL, 'Mouvement', triggered=lambda:self.showDialogMove(item)))
+        menu.addSeparator()
+        menu.addAction(Action(FIF.DELETE, 'Supprimer', triggered=lambda:self.confirmDeleteItem(item)))
+        menu.menuActions()[-2].setCheckable(True)
+        menu.menuActions()[-2].setChecked(True)
+
+        self.posCur = QCursor().pos()
+        cur_x = self.posCur.x()
+        cur_y = self.posCur.y()
+
+        menu.exec(QPoint(cur_x, cur_y), aniType=MenuAnimationType.DROP_DOWN)
+
+    def confirmDeleteItem(self, item: QModelIndex):
+        confirm = MessageBox("Confirmation", "Voulez vous supprimer vraiment", self.parent)
+        confirm.accepted.connect(lambda:self.deleteItem(item))
+        confirm.show()
+    
+    def showItem(self, item: QModelIndex):
+        #id = self.table.item(item.row(), 0).text()
+        #DialogStudentShow(id, self.myParent).show()
+        print(item.row())
+
+    def deleteItem(self, item: QModelIndex):
+        id = self.table.item(item.row(), 0).text()
+        self.studentService.deleteById(id)
+        self.infoMessage(self.parent, "Succès", "Données supprimées!")
+        self.refreshTable()
+
+    def infoMessage(self, parent, title:str, message:str):
+        InfoBar.success(
+            title=title,
+            content=message,
+            orient=Qt.Horizontal,
+            isClosable=True,
+            position=InfoBarPosition.TOP,
+            duration=2000,
+            parent=parent
+        )
